@@ -29,7 +29,8 @@ const IMGDetect = {
                     return
                 }
     
-                callback(ret.response.msg)
+                let telnum = ret.response.msg
+                callback(telnum.replace(/[ ]/g,"").replace(/\n/g, ""))
             }
         })
     },
@@ -93,7 +94,7 @@ const Liepin = {
         }
 
         let rcText = ret[0].rcContext
-        return rcText.split("：")[1]
+        return rcText.split("：")[1].trim()
     },
 }
 
@@ -125,6 +126,7 @@ const KrERP = {
             onload: (ret)=>{
                 if(ret.response.code!=200){
                     GM_deleteValue("accessToken")
+                    alert("ERP未登录或已过期，请登录ERP并刷新任意页面")
                     return
                 }
     
