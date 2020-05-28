@@ -51,7 +51,7 @@ const Liepin = {
             onload: callback
         })
     },
-    listComments(cnResIdEncode, enResIdEncode, noMarkCallback, markedCallback) {
+    listComments(cnResIdEncode, enResIdEncode, telNotExistCallback, telExistCallback) {
         GM_xmlhttpRequest({
             method: "POST",
             url: "https://h.liepin.com/resumeview/showcommentnextpage.json?traceId=16549410584",
@@ -62,17 +62,28 @@ const Liepin = {
             data: "resIdEncode="+cnResIdEncode+"&cnResIdEncode="+cnResIdEncode+"&enResIdEncode="+enResIdEncode+"&lastId=&lastShareId=",
             responseType: "json",
             onload: (ret) => {
+                console.log(ret)
                 let data = ret.response.data
-                if(!data.curUserhId){
-                    noMarkCallback()
-                } else{
-                    markedCallback(data.commentList)
+                if (!data.curUserhId) {
+                    telNotExistCallback()
+                    return
+                }
+
+                let existTel = this.matchTelFromComments(data.commentList)
+                if (existTel) {
+                    telExistCallback(existTel)
+                }  else if (!existTel && data.commentList.length < 10) {
+                    telNotExistCallback()
                 }
             }
         })
     },
     saveComment(resIdEncode, usercEncodeId, rcContext){
-        console.log(rcContext)
+        if (!rcContext.match(/\b1\d{10}\b/g)){
+            console.log(rcContext+" not contain a mobile number")
+            return
+        }
+        
         GM_xmlhttpRequest({
             method: "POST",
             url: "https://h.liepin.com/resume/savecomment.json?traceId=81132202284",
@@ -87,14 +98,14 @@ const Liepin = {
             }
         })
     },
-    matchTelFromComments(commentList, name){
-        let ret = commentList.filter(comment => comment.rcContext.substring(0, name.length) == name);
-        if (!ret.length) {
-            return
+    matchTelFromComments(commentList) {
+        for (let index = 0; index < commentList.length; index++) {
+            const comment = commentList[index];
+            let ret = comment.rcContext.match(/\b1\d{10}\b/g)
+            if (ret) {
+                return ret.pop()
+            }
         }
-
-        let rcText = ret[0].rcContext
-        return rcText.split("：")[1].trim()
     },
 }
 
@@ -150,15 +161,9 @@ function detectPhoneAndMark(){
                 let rcContext = resume.showName +"："+ tel
                 Liepin.saveComment(resIdEncode, resume.usercIdEncode, rcContext)
             })
-        }, (commentList) => {
-            let markedTel = Liepin.matchTelFromComments(commentList, resume.showName)
-            if (!markedTel) {
-                console.log('tel not matched')
-                return
-            }
-
+        }, (existTel) => {
             // 已经备注过的，显示出入库状态
-            KrERP.search(markedTel, function(ret) {
+            KrERP.search(existTel, function(ret) {
                 let tagText = "未知"
                 if(ret){
                     tagText = "已入库"
