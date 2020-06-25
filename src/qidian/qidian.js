@@ -1,5 +1,5 @@
-const f = {
-    run() {
+export default {
+    bootstrap() {
         // 自动登录后只能跳到首页，这里自动跳去领取页
         if(location.host == "my.qidian.com" && location.pathname == "/"){
             location.pathname = "/level"
@@ -17,8 +17,7 @@ const f = {
             window.addEventListener('load', expGet, false);
             return
         }
-
-        window.addEventListener('load', f.progress, false);
+        window.addEventListener('load', this.progress, false);
     },
     progress() { 
         // 计算逻辑，每次打开任意网页时执行，上次领取时间间隔满足领取条件则自动打开经验值领取页
@@ -54,9 +53,3 @@ const f = {
         }
     }
 };
-
-(function() {
-    'use strict';
-
-    f.run();
-})();
