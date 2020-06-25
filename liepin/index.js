@@ -16,7 +16,8 @@ const IMGDetect = {
 
         GM_xmlhttpRequest({
             method: "POST",
-            url: "https://num.market.alicloudapi.com/textreadplus",
+            url: "http://gofc.saltbo.cn/detect/number",
+            // url: "http://localhost:8080/detect/number",
             headers: {
                 "Authorization": "APPCODE "+ window.appcode,
                 "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
@@ -38,10 +39,13 @@ const IMGDetect = {
 
 // liepin
 const Liepin = {
+    traceId() {
+        return new Date().getTime().toString().substr(4)+Math.random().toString().substr(2, 2)
+    },
     getResumeDetail(resIdEncode, callback) {
         GM_xmlhttpRequest({
             method: "POST",
-            url: "https://h.liepin.com/resumeview/getresumedetailcoreview.json?traceId=16413734414",
+            url: "https://h.liepin.com/resumeview/getresumedetailcoreview.json?traceId="+this.traceId(),
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "X-Requested-With": "XMLHttpRequest"
@@ -54,7 +58,7 @@ const Liepin = {
     listComments(cnResIdEncode, enResIdEncode, telNotExistCallback, telExistCallback) {
         GM_xmlhttpRequest({
             method: "POST",
-            url: "https://h.liepin.com/resumeview/showcommentnextpage.json?traceId=16549410584",
+            url: "https://h.liepin.com/resumeview/showcommentnextpage.json?traceId="+this.traceId(),
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "X-Requested-With": "XMLHttpRequest"
@@ -86,7 +90,7 @@ const Liepin = {
         
         GM_xmlhttpRequest({
             method: "POST",
-            url: "https://h.liepin.com/resume/savecomment.json?traceId=81132202284",
+            url: "https://h.liepin.com/resume/savecomment.json?traceId="+this.traceId(),
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "X-Requested-With": "XMLHttpRequest"
