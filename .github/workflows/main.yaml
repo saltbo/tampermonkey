@@ -10,5 +10,18 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - run: yarn && yarn build
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Build
+        run: yarn && yarn build
+      - name: Publish
+        uses: saltbo/uptoc@develop
+        with:
+          driver: oss
+          region: cn-zhangjiakou
+          bucket: saltbo-static
+          saveroot: tampermonkey
+          dist: dist
+        env:
+          UPTOC_UPLOADER_AK: ${{ secrets.UPTOC_UPLOADER_KEYID }}
+          UPTOC_UPLOADER_SK: ${{ secrets.UPTOC_UPLOADER_KEYSECRET }}
